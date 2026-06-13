@@ -3,30 +3,35 @@ name: EKS Argocd
 on:
   push:
     branches: [ "main" ]
+
 env:
-  REPO_NAME: eks-arocd-app
+  REPO_NAME: eks-argocd-app
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - name: Code Checkout
       uses: actions/checkout@v4
 
-    - name: Build the Docker image
-      run: "docker build -t manivannancsmca/eks-arocd-app:${GITHUB_SHA::7} ."
+    # New Step: Generate the 7-character short SHA
+    - name: Set Short SHA
+      id: vars
+      run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
     - name: Log in to Docker Hub
-      uses: docker/login-action@v4
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Push Docker Image to Docker Hub
+    - name: Build and Push Docker Image
       uses: docker/build-push-action@v6
       with:
+        context: .
         push: true
+        # Use the new SHORT_SHA environment variable here
         tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/{{env.REPO_NAME}}:${{ github.sha }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest
