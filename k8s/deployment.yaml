@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eks-arocd-app
+  namespace: default
+  labels:
+    app: eks-arocd-app
+spec:
+  replicas: 2 # Runs two copies of your app for high availability
+  selector:
+    matchLabels:
+      app: eks-arocd-app
+  template:
+    metadata:
+      labels:
+        app: eks-arocd-app
+    spec:
+      containers:
+        - name: hello-world-api
+          # Replace this with your actual Docker Hub / ECR image path
+          image: your-dockerhub-username/spring-boot-hello-world:latest 
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086 # Spring Boot default port
+          
+          # Resource management to prevent the container from crashing your nodes
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          
+          # Health checks (Assumes Spring Boot Actuator is enabled)
+          # If you don't use Actuator, change the path to your "/" hello world endpoint
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8086
+            initialDelaySeconds: 20 # Gives Spring Boot time to start up before checking
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8086
+            initialDelaySeconds: 30
+            periodSeconds: 15
