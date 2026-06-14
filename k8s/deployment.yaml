@@ -18,7 +18,7 @@ spec:
       containers:
         - name: eks-argocd-app
           # Fixed spelling: 'arocd' to 'argocd' to match your GitHub workflow env variable
-          image: manivannancsmca/eks-argocd-app:PLACEHOLDER 
+          image: manivannancsmca/eks-argocd-app:3e0b667
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8086 
