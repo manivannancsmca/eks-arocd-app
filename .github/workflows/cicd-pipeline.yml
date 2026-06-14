@@ -48,6 +48,11 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add k8s/deployment.yaml
-        # Using $SHORT_SHA directly here ensures clean execution in Bash
-        git commit -m "Deploy: Update image tag to $SHORT_SHA [skip ci]"
-        git push
+        
+        # Check if there are any staged changes before committing
+        if ! git diff --cached --quiet; then
+          git commit -m "Deploy: Update image tag to $SHORT_SHA [skip ci]"
+          git push
+        else
+          echo "No changes detected in deployment.yaml. Skipping commit."
+        fi
