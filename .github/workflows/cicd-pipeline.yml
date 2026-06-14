@@ -37,18 +37,17 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}
 
-    # New Step: Update the deployment.yaml file with the new short SHA tag
     - name: Update Kubernetes Deployment Image Tag
       run: |
         # Use sed to find the image line and replace the tag with the new SHORT_SHA
-        # Adjust the path 'k8s/deployment.yaml' to match where your file lives
+        # Ensure k8s/deployment.yaml matches the exact path in your repository
         sed -i "s|image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
 
-    # New Step: Push the updated deployment file back to GitHub
     - name: Commit and Push Changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add k8s/deployment.yaml
-        git commit -m "Deploy: Update image tag to ${ { env.SHORT_SHA } } [skip ci]"
+        # Using $SHORT_SHA directly here ensures clean execution in Bash
+        git commit -m "Deploy: Update image tag to $SHORT_SHA [skip ci]"
         git push
