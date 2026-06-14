@@ -8,6 +8,6 @@ public class HelloController {
 
     @GetMapping("/api/hello")
     public String hello() {
-        return "Hello, Mr. Manivannan K";
+        return "Hello, Mr. Manivannan K. Your application is running in AWS EKS Server with Argocd";
     }
 }
