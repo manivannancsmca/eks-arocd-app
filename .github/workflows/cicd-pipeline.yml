@@ -1,4 +1,4 @@
-name: EKS Argocd
+name: EKS Argocd Pipeline
 
 on:
   push:
@@ -8,14 +8,17 @@ env:
   REPO_NAME: eks-argocd-app
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
+    # Gives the workflow permission to commit changes back to the repository
+    permissions:
+      contents: write
 
     steps:
     - name: Code Checkout
       uses: actions/checkout@v4
 
-    # New Step: Generate the 7-character short SHA
     - name: Set Short SHA
       id: vars
       run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
@@ -31,7 +34,21 @@ jobs:
       with:
         context: .
         push: true
-        # Use the new SHORT_SHA environment variable here
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}
-          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:latest
+
+    # New Step: Update the deployment.yaml file with the new short SHA tag
+    - name: Update Kubernetes Deployment Image Tag
+      run: |
+        # Use sed to find the image line and replace the tag with the new SHORT_SHA
+        # Adjust the path 'k8s/deployment.yaml' to match where your file lives
+        sed -i "s|image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.REPO_NAME }}:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
+
+    # New Step: Push the updated deployment file back to GitHub
+    - name: Commit and Push Changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add k8s/deployment.yaml
+        git commit -m "Deploy: Update image tag to ${ { env.SHORT_SHA } } [skip ci]"
+        git push

@@ -18,7 +18,7 @@ spec:
       containers:
         - name: hello-world-api
           # Replace this with your actual Docker Hub / ECR image path
-          image: your-dockerhub-username/spring-boot-hello-world:latest 
+          image: manivannancsmca/eks-arocd-app:PLACEHOLDER 
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8086 # Spring Boot default port
