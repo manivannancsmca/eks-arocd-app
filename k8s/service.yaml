@@ -11,3 +11,4 @@ spec:
     - protocol: TCP
       port: 80         # The port you will type into your browser
       targetPort: 8086 # Your internal Spring Boot app port
+      
