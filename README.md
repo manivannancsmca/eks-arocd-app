@@ -1,3 +1,4 @@
+
 # End-to-End GitOps Pipeline: Spring Boot on AWS EKS with ArgoCD
 
 This documentation provides a comprehensive, step-by-step guide to provisioning an AWS EKS cluster, installing and configuring ArgoCD, establishing prerequisites for your Spring Boot application, and setting up an automated CI/CD loop.
@@ -95,3 +96,4 @@ Organize your repository as follows:
 ├── Dockerfile                       # Multi-stage image builder file
 └── ...                              # Main Spring Boot source files
 ```
+
